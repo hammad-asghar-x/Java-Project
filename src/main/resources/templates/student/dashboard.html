@@ -36,50 +36,64 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Left Column: Entry Form -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                <h2 class="text-lg font-semibold mb-4">Log Today's Entry</h2>
-                <form th:action="@{/student/entry}" method="post" class="space-y-5">
+            <!-- Left Column: Entry Form & Export -->
+            <div class="space-y-6">
+                <!-- NEW: Export Report Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex justify-between items-center">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Mood (1-10)</label>
-                        <input type="range" name="mood" min="1" max="10" value="5" class="w-full accent-blue-600" oninput="this.nextElementSibling.textContent = this.value">
-                        <div class="flex justify-between text-xs text-slate-500 mt-1">
-                            <span>1 (Low)</span><span class="font-bold text-blue-600">5</span><span>10 (High)</span>
+                        <h3 class="font-semibold text-slate-800">Progress Report</h3>
+                        <p class="text-xs text-slate-500 mt-1">Download a PDF summary of your mental health journey.</p>
+                    </div>
+                    <a th:href="@{/student/export-pdf}" class="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition font-semibold text-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Download PDF
+                    </a>
+                </div>
+
+                <!-- Entry Form -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                    <h2 class="text-lg font-semibold mb-4">Log Today's Entry</h2>
+                    <form th:action="@{/student/entry}" method="post" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Mood (1-10)</label>
+                            <input type="range" name="mood" min="1" max="10" value="5" class="w-full accent-blue-600" oninput="this.nextElementSibling.textContent = this.value">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>1 (Low)</span><span class="font-bold text-blue-600">5</span><span>10 (High)</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1">Stress Level (1-10)</label>
-                        <input type="range" name="stress" min="1" max="10" value="5" class="w-full accent-rose-500" oninput="this.nextElementSibling.textContent = this.value">
-                        <div class="flex justify-between text-xs text-slate-500 mt-1">
-                            <span>1 (Calm)</span><span class="font-bold text-rose-600">5</span><span>10 (Overwhelmed)</span>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Stress Level (1-10)</label>
+                            <input type="range" name="stress" min="1" max="10" value="5" class="w-full accent-rose-500" oninput="this.nextElementSibling.textContent = this.value">
+                            <div class="flex justify-between text-xs text-slate-500 mt-1">
+                                <span>1 (Calm)</span><span class="font-bold text-rose-600">5</span><span>10 (Overwhelmed)</span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
-                            <span>Optional Notes</span>
-                            <!-- NEW: Voice Journal Button -->
-                            <button type="button" id="voice-btn" class="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
-                                <span id="voice-text">Use Voice</span>
-                            </button>
-                        </label>
-                        <textarea name="notes" id="notes-area" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="How are you feeling today?"></textarea>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm font-medium text-slate-700">Mark as Anonymous</label>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" name="isAnonymous" value="true" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                        </label>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save Entry</button>
-                </form>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1 flex justify-between">
+                                <span>Optional Notes</span>
+                                <button type="button" id="voice-btn" class="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                                    <span id="voice-text">Use Voice</span>
+                                </button>
+                            </label>
+                            <textarea name="notes" id="notes-area" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="How are you feeling today?"></textarea>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium text-slate-700">Mark as Anonymous</label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="isAnonymous" value="true" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save Entry</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Right Column: Insights & Gamification -->
             <div class="space-y-6">
                 
-                <!-- NEW: Gamification Card -->
+                <!-- Gamification Card -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                     <h2 class="text-lg font-semibold mb-4 text-slate-800">Your Progress</h2>
                     <div class="grid grid-cols-3 gap-4 text-center mb-6">
@@ -219,7 +233,7 @@
             container.appendChild(weekDiv);
         }
 
-        // --- NEW: Voice Journal Logic (Web Speech API) ---
+        // --- Voice Journal Logic ---
         const voiceBtn = document.getElementById('voice-btn');
         const voiceText = document.getElementById('voice-text');
         const notesArea = document.getElementById('notes-area');
@@ -255,7 +269,7 @@
                 }
             });
         } else {
-            voiceBtn.style.display = 'none'; // Hide if browser doesn't support it
+            voiceBtn.style.display = 'none';
         }
         /*]]>*/
     </script>

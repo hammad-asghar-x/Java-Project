@@ -3,6 +3,8 @@ package com.mentalhealth.stresstracker.controller;
 import com.mentalhealth.stresstracker.model.Entry;
 import com.mentalhealth.stresstracker.model.User;
 import com.mentalhealth.stresstracker.service.EntryService;
+import com.mentalhealth.stresstracker.service.PdfExportService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -23,9 +26,12 @@ import java.util.stream.Collectors;
 public class StudentController {
 
     private final EntryService entryService;
+    private final PdfExportService pdfExportService; // Added
 
-    public StudentController(EntryService entryService) {
+    // Updated Constructor
+    public StudentController(EntryService entryService, PdfExportService pdfExportService) {
         this.entryService = entryService;
+        this.pdfExportService = pdfExportService;
     }
 
     @GetMapping("/student/dashboard")
@@ -57,10 +63,10 @@ public class StudentController {
         // 4. Smart Recommendation
         model.addAttribute("recommendation", entryService.getSmartRecommendation(user.getId()));
 
-        // --- NEW: Gamification Data ---
-        model.addAttribute("currentStreak", user.getCurrentStreak());
-        model.addAttribute("longestStreak", user.getLongestStreak());
-        model.addAttribute("totalEntries", user.getTotalEntries());
+        // 5. Gamification Data
+        model.addAttribute("currentStreak", user.getCurrentStreak() != null ? user.getCurrentStreak() : 0);
+        model.addAttribute("longestStreak", user.getLongestStreak() != null ? user.getLongestStreak() : 0);
+        model.addAttribute("totalEntries", user.getTotalEntries() != null ? user.getTotalEntries() : 0);
         model.addAttribute("badges", entryService.getUserBadges(user.getId()));
 
         return "student/dashboard";
@@ -82,5 +88,24 @@ public class StudentController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to save entry: " + e.getMessage());
         }
         return "redirect:/student/dashboard";
+    }
+
+    // --- NEW: PDF Export Endpoint ---
+    @GetMapping("/student/export-pdf")
+    public void exportPdf(@AuthenticationPrincipal User user, HttpServletResponse response) throws IOException {
+        // Get the last 30 entries for the report
+        List<Entry> entries = entryService.getRecentEntries(user.getId(), 30);
+        
+        // Generate PDF bytes
+        byte[] pdfBytes = pdfExportService.generateStudentReport(user, entries);
+
+        // Set response headers for file download
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=mental_health_report.pdf");
+        response.setContentLength(pdfBytes.length);
+
+        // Write to response output stream
+        response.getOutputStream().write(pdfBytes);
+        response.getOutputStream().flush();
     }
 }
