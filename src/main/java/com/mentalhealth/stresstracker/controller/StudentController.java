@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -32,9 +33,8 @@ public class StudentController {
         model.addAttribute("studentName", user.getName());
         model.addAttribute("todayDate", LocalDate.now());
 
-        // 1. Get Data for Chart (Last 7 days)
+        // 1. Chart Data (Last 7 days)
         List<Entry> chartEntries = entryService.getRecentEntries(user.getId(), 7);
-        // Reverse so chart goes from oldest (left) to newest (right)
         List<Entry> reversedChartEntries = new ArrayList<>(chartEntries);
         Collections.reverse(reversedChartEntries);
 
@@ -48,9 +48,17 @@ public class StudentController {
         model.addAttribute("moods", moods);
         model.addAttribute("stresses", stresses);
 
-        // 2. Get Data for Recent Entries List (Last 5 days)
+        // 2. Recent Entries List (Last 5 days)
         List<Entry> recentEntries = entryService.getRecentEntries(user.getId(), 5);
         model.addAttribute("recentEntries", recentEntries);
+
+        // 3. Heatmap Data (Last 90 days)
+        Map<String, Integer> heatmapData = entryService.getStressHeatmapData(user.getId());
+        model.addAttribute("heatmapData", heatmapData);
+
+        // 4. Smart Recommendation
+        String recommendation = entryService.getSmartRecommendation(user.getId());
+        model.addAttribute("recommendation", recommendation);
 
         return "student/dashboard";
     }
