@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
+    
     <!-- Navbar -->
     <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
         <h1 class="text-xl font-bold text-blue-600">Stress Tracker</h1>
@@ -19,9 +20,9 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto p-6 mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <main class="max-w-6xl mx-auto p-6 mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        <!-- Left: Entry Form -->
+        <!-- Left Column: Entry Form -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
             <h2 class="text-lg font-semibold mb-4">Log Today's Entry</h2>
             
@@ -66,15 +67,105 @@
             </form>
         </div>
 
-        <!-- Right: Insights Placeholder -->
+        <!-- Right Column: Insights -->
         <div class="space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-64 flex items-center justify-center text-slate-400">
-                Weekly Trends Chart (Phase 4)
+            
+            <!-- Weekly Trends Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-lg font-semibold mb-4 text-slate-800">Weekly Trends</h2>
+                <div class="h-64">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
             </div>
-            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-48 flex items-center justify-center text-slate-400">
-                Recent Entries (Phase 4)
+
+            <!-- Recent Entries -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                <h2 class="text-lg font-semibold mb-4 text-slate-800">Recent Entries</h2>
+                <div class="space-y-3 max-h-64 overflow-y-auto pr-2">
+                    <div th:if="${#lists.isEmpty(recentEntries)}" class="text-slate-500 text-sm text-center py-4">
+                        No entries yet. Log your first entry!
+                    </div>
+                    
+                    <div th:each="entry : ${recentEntries}" class="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <div>
+                            <p class="text-sm font-medium text-slate-800" th:text="${#temporals.format(entry.date, 'MMM dd, yyyy')}">Date</p>
+                            <p class="text-xs text-slate-500 truncate max-w-[200px]" th:text="${entry.notes != null ? entry.notes : 'No notes'}">Notes</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800" th:text="'Mood: ' + ${entry.mood}">Mood</span>
+                            <span th:classappend="${entry.stress > 7} ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" 
+                                  class="px-2 py-1 text-xs font-semibold rounded-full" 
+                                  th:text="'Stress: ' + ${entry.stress}">Stress</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chart Configuration -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Safely get data from Thymeleaf with fallback to empty arrays
+        const datesData = /*[[${dates}]]*/ [];
+        const moodsData = /*[[${moods}]]*/ [];
+        const stressesData = /*[[${stresses}]]*/ [];
+        
+        // Ensure data is properly formatted as arrays
+        const dates = Array.isArray(datesData) ? datesData : [];
+        const moods = Array.isArray(moodsData) ? moodsData : [];
+        const stresses = Array.isArray(stressesData) ? stressesData : [];
+
+        // Only create chart if we have data
+        if (dates.length > 0 && moods.length > 0 && stresses.length > 0) {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Mood',
+                            data: moods,
+                            borderColor: '#2563EB', // Blue-600
+                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Stress',
+                            data: stresses,
+                            borderColor: '#F43F5E', // Rose-500
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: { display: true, text: 'Score (1-10)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        } else {
+            // Show message if no data
+            const chartContainer = document.querySelector('#weeklyChart').parentElement;
+            chartContainer.innerHTML += '<p class="text-slate-500 text-sm text-center py-8">No data available. Log entries for the past week to see trends.</p>';
+        }
+        /*]]>*/
+    </script>
 </body>
 </html>

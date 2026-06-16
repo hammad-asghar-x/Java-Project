@@ -1,5 +1,6 @@
 package com.mentalhealth.stresstracker.controller;
 
+import com.mentalhealth.stresstracker.model.Entry;
 import com.mentalhealth.stresstracker.model.User;
 import com.mentalhealth.stresstracker.service.EntryService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class StudentController {
@@ -25,6 +31,27 @@ public class StudentController {
     public String showDashboard(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("studentName", user.getName());
         model.addAttribute("todayDate", LocalDate.now());
+
+        // 1. Get Data for Chart (Last 7 days)
+        List<Entry> chartEntries = entryService.getRecentEntries(user.getId(), 7);
+        // Reverse so chart goes from oldest (left) to newest (right)
+        List<Entry> reversedChartEntries = new ArrayList<>(chartEntries);
+        Collections.reverse(reversedChartEntries);
+
+        List<String> dates = reversedChartEntries.stream()
+                .map(e -> e.getDate().format(DateTimeFormatter.ofPattern("MMM dd")))
+                .collect(Collectors.toList());
+        List<Integer> moods = reversedChartEntries.stream().map(Entry::getMood).collect(Collectors.toList());
+        List<Integer> stresses = reversedChartEntries.stream().map(Entry::getStress).collect(Collectors.toList());
+
+        model.addAttribute("dates", dates);
+        model.addAttribute("moods", moods);
+        model.addAttribute("stresses", stresses);
+
+        // 2. Get Data for Recent Entries List (Last 5 days)
+        List<Entry> recentEntries = entryService.getRecentEntries(user.getId(), 5);
+        model.addAttribute("recentEntries", recentEntries);
+
         return "student/dashboard";
     }
 
