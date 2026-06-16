@@ -4,12 +4,20 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+// --- NEW IMPORTS FOR JSON FIX ---
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+// --------------------------------
+
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
+// FIX: Tells Jackson to ignore Hibernate's internal proxy fields
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
 public class User implements UserDetails {
 
     @Id
@@ -22,6 +30,8 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
+    // SECURITY FIX: NEVER send the hashed password to the frontend JSON
+    @JsonIgnore 
     @Column(nullable = false)
     private String password;
 
@@ -35,7 +45,7 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // --- NEW: Gamification Fields ---
+    // --- Gamification Fields ---
     @Column(name = "current_streak")
     private Integer currentStreak = 0;
 
@@ -72,7 +82,6 @@ public class User implements UserDetails {
     
     public LocalDateTime getCreatedAt() { return createdAt; }
 
-    // --- NEW Getters and Setters ---
     public Integer getCurrentStreak() { return currentStreak; }
     public void setCurrentStreak(Integer currentStreak) { this.currentStreak = currentStreak; }
     

@@ -36,8 +36,9 @@
                         <td class="p-4 font-medium text-slate-800" th:text="${student.name}">Name</td>
                         <td class="p-4 text-slate-600" th:text="${student.studentId}">ID</td>
                         <td class="p-4 text-slate-600" th:text="${student.email}">Email</td>
-                        <td class="p-4">
+                        <td class="p-4 flex gap-2">
                             <a th:href="@{/counselor/students/{id}(id=${student.id})}" class="text-blue-600 hover:underline text-sm font-semibold">View History</a>
+                            <a th:href="@{/chat/student/{id}(id=${student.id})}" class="bg-emerald-500 text-white px-3 py-1 rounded-lg hover:bg-emerald-600 text-sm font-semibold">Chat</a>
                         </td>
                     </tr>
                     <tr th:if="${students.isEmpty()}">

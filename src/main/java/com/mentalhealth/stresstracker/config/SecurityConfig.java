@@ -26,6 +26,7 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/api/chat/**").authenticated() // <--- THIS ALLOWS THE CHAT API
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/counselor/**").hasRole("COUNSELOR")
                 .requestMatchers("/student/**").hasRole("STUDENT")
