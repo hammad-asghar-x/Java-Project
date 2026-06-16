@@ -1,7 +1,6 @@
 package com.mentalhealth.stresstracker.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class User implements UserDetails {
 
     @Id
@@ -32,7 +30,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(name = "student_id", unique = true)
-    private String studentId; // Only for students
+    private String studentId;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -42,6 +40,28 @@ public class User implements UserDetails {
         this.createdAt = LocalDateTime.now();
     }
 
+    // --- Standard Getters and Setters (Replaces Lombok) ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    @Override
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+    
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
+
     // --- Spring Security Implementation ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -50,6 +70,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() { return email; }
+    
     @Override
     public boolean isAccountNonExpired() { return true; }
     @Override

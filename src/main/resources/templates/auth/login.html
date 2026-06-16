@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Stress Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-slate-100">
+        <h2 class="text-2xl font-bold text-center text-blue-600 mb-2">Mental Health Tracker</h2>
+        <p class="text-center text-slate-500 mb-6">Student Login</p>
+
+        <div th:if="${param.error}" class="bg-rose-100 text-rose-700 p-3 rounded-lg mb-4 text-sm">Invalid email or password.</div>
+        <div th:if="${successMessage}" class="bg-emerald-100 text-emerald-700 p-3 rounded-lg mb-4 text-sm" th:text="${successMessage}"></div>
+
+        <form th:action="@{/login}" method="post" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input type="email" name="username" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <input type="password" name="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Login</button>
+        </form>
+        <p class="text-center text-sm text-slate-500 mt-6">Don't have an account? <a th:href="@{/register}" class="text-blue-600 font-semibold hover:underline">Register here</a></p>
+    </div>
+</body>
+</html>

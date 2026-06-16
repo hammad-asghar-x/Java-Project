@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-blue-600">Stress Tracker</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-slate-600" th:text="${studentName}">Student Name</span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="text-sm text-slate-600 hover:text-rose-500 font-semibold">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto p-6 mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Left: Entry Form -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-lg font-semibold mb-4">Log Today's Entry</h2>
+            
+            <div th:if="${successMessage}" class="bg-emerald-100 text-emerald-700 p-3 rounded-lg mb-4 text-sm" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="bg-rose-100 text-rose-700 p-3 rounded-lg mb-4 text-sm" th:text="${errorMessage}"></div>
+
+            <form th:action="@{/student/entry}" method="post" class="space-y-5">
+                <!-- Mood Slider -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Mood (1-10)</label>
+                    <input type="range" name="mood" min="1" max="10" value="5" class="w-full accent-blue-600" oninput="this.nextElementSibling.textContent = this.value">
+                    <div class="flex justify-between text-xs text-slate-500 mt-1">
+                        <span>1 (Low)</span><span class="font-bold text-blue-600">5</span><span>10 (High)</span>
+                    </div>
+                </div>
+
+                <!-- Stress Slider -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Stress Level (1-10)</label>
+                    <input type="range" name="stress" min="1" max="10" value="5" class="w-full accent-rose-500" oninput="this.nextElementSibling.textContent = this.value">
+                    <div class="flex justify-between text-xs text-slate-500 mt-1">
+                        <span>1 (Calm)</span><span class="font-bold text-rose-600">5</span><span>10 (Overwhelmed)</span>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Optional Notes</label>
+                    <textarea name="notes" rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="How are you feeling today?"></textarea>
+                </div>
+
+                <!-- Anonymous Toggle -->
+                <div class="flex items-center justify-between">
+                    <label class="text-sm font-medium text-slate-700">Mark as Anonymous</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="isAnonymous" value="true" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold">Save Entry</button>
+            </form>
+        </div>
+
+        <!-- Right: Insights Placeholder -->
+        <div class="space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-64 flex items-center justify-center text-slate-400">
+                Weekly Trends Chart (Phase 4)
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-48 flex items-center justify-center text-slate-400">
+                Recent Entries (Phase 4)
+            </div>
+        </div>
+    </main>
+</body>
+</html>

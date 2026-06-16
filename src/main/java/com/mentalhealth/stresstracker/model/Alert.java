@@ -1,12 +1,10 @@
 package com.mentalhealth.stresstracker.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "alerts")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Alert {
 
     @Id
@@ -25,7 +23,6 @@ public class Alert {
     private String message;
 
     @Column(name = "is_resolved")
-    @Builder.Default // <-- ADD THIS LINE
     private Boolean isResolved = false;
 
     @Column(name = "created_at", updatable = false)
@@ -35,4 +32,22 @@ public class Alert {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    // --- Standard Getters and Setters (Replaces Lombok) ---
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public User getStudent() { return student; }
+    public void setStudent(User student) { this.student = student; }
+    
+    public User getCounselor() { return counselor; }
+    public void setCounselor(User counselor) { this.counselor = counselor; }
+    
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+    
+    public Boolean getIsResolved() { return isResolved; }
+    public void setIsResolved(Boolean isResolved) { this.isResolved = isResolved; }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
