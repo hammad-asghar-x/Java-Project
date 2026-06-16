@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Students</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+    
+    <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-blue-600">Counselor Portal</h1>
+        <div class="flex gap-4">
+            <a th:href="@{/counselor/dashboard}" class="text-slate-600 hover:text-blue-600 font-semibold">Dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="text-slate-600 hover:text-rose-500 font-semibold">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 mt-8">
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Student Directory</h2>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="p-4 text-sm font-semibold text-slate-600">Name</th>
+                        <th class="p-4 text-sm font-semibold text-slate-600">Student ID</th>
+                        <th class="p-4 text-sm font-semibold text-slate-600">Email</th>
+                        <th class="p-4 text-sm font-semibold text-slate-600">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr th:each="student : ${students}" class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-medium text-slate-800" th:text="${student.name}">Name</td>
+                        <td class="p-4 text-slate-600" th:text="${student.studentId}">ID</td>
+                        <td class="p-4 text-slate-600" th:text="${student.email}">Email</td>
+                        <td class="p-4">
+                            <a th:href="@{/counselor/students/{id}(id=${student.id})}" class="text-blue-600 hover:underline text-sm font-semibold">View History</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${students.isEmpty()}">
+                        <td colspan="4" class="p-6 text-center text-slate-500">No students registered yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

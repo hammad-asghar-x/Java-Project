@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+    
+    <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-blue-600">Counselor Portal</h1>
+        <div class="flex gap-4">
+            <a th:href="@{/counselor/students}" class="text-slate-600 hover:text-blue-600 font-semibold">Back to Students</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="text-slate-600 hover:text-rose-500 font-semibold">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-6 mt-8">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 mb-6">
+            <h2 class="text-2xl font-bold text-slate-800" th:text="${student.name}">Student Name</h2>
+            <p class="text-slate-500 mt-1">
+                <span th:text="${student.studentId}">ID</span> • 
+                <span th:text="${student.email}">Email</span>
+            </p>
+        </div>
+
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">Entry History</h3>
+        <div class="space-y-4">
+            <div th:each="entry : ${entries}" class="bg-white rounded-xl shadow-sm border border-slate-100 p-4 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-medium text-slate-800" th:text="${#temporals.format(entry.date, 'MMM dd, yyyy')}">Date</p>
+                    <p class="text-xs text-slate-500 mt-1" th:text="${entry.notes != null ? entry.notes : 'No notes'}">Notes</p>
+                    <p th:if="${entry.isAnonymous}" class="text-xs text-emerald-600 font-semibold mt-1">Anonymous Entry</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800" th:text="'Mood: ' + ${entry.mood}">Mood</span>
+                    <span th:classappend="${entry.stress > 7} ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" 
+                          class="px-3 py-1 text-sm font-semibold rounded-full" 
+                          th:text="'Stress: ' + ${entry.stress}">Stress</span>
+                </div>
+            </div>
+            <div th:if="${entries.isEmpty()}" class="text-center text-slate-500 py-8 bg-white rounded-xl border border-slate-100">
+                This student has not logged any entries yet.
+            </div>
+        </div>
+    </main>
+</body>
+</html>

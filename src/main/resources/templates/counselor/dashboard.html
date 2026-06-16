@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+    
+    <nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-blue-600">Counselor Portal</h1>
+        <div class="flex gap-4">
+            <a th:href="@{/counselor/students}" class="text-slate-600 hover:text-blue-600 font-semibold">All Students</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="text-slate-600 hover:text-rose-500 font-semibold">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 mt-8">
+        
+        <div th:if="${successMessage}" class="bg-emerald-100 text-emerald-700 p-3 rounded-lg mb-6 text-sm" th:text="${successMessage}"></div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-sm font-medium text-slate-500">Total Students</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2" th:text="${totalStudents}">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-sm font-medium text-slate-500">Active Alerts</h3>
+                <p class="text-3xl font-bold text-rose-500 mt-2" th:text="${alerts.size()}">0</p>
+            </div>
+        </div>
+
+        <!-- At-Risk Alert Banner -->
+        <div class="bg-white rounded-xl shadow-sm border border-rose-100 p-6 mb-8">
+            <h2 class="text-lg font-semibold text-rose-600 mb-4">🚨 At-Risk Students (Unresolved Alerts)</h2>
+            
+            <div th:if="${alerts.isEmpty()}" class="text-slate-500 text-center py-4">
+                No active alerts. All students are doing well!
+            </div>
+
+            <div class="space-y-4">
+                <div th:each="alert : ${alerts}" class="flex justify-between items-center p-4 bg-rose-50 rounded-lg border border-rose-200">
+                    <div>
+                        <p class="font-semibold text-slate-800" th:text="${alert.student.name}">Student Name</p>
+                        <p class="text-sm text-slate-600" th:text="${alert.message}">Alert message</p>
+                        <p class="text-xs text-slate-400 mt-1" th:text="${#temporals.format(alert.createdAt, 'MMM dd, yyyy HH:mm')}">Date</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <a th:href="@{/counselor/students/{id}(id=${alert.student.id})}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-semibold">View Details</a>
+                        <form th:action="@{/counselor/alerts/{id}/resolve(id=${alert.id})}" method="post">
+                            <button type="submit" class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 text-sm font-semibold">Mark Resolved</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
