@@ -10,4 +10,5 @@ public interface EntryService {
     List<Entry> getRecentEntries(Long userId, int limit);
     Map<String, Integer> getStressHeatmapData(Long userId);
     String getSmartRecommendation(Long userId);
+    List<Map<String, String>> getUserBadges(Long userId);
 }

@@ -9,6 +9,7 @@ import com.mentalhealth.stresstracker.service.EntryService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,38 @@ public class EntryServiceImpl implements EntryService {
 
         entryRepository.save(entry);
         alertService.checkAndCreateAlert(userId);
+
+        // Update Gamification Stats
+        updateGamificationStats(user, date);
+    }
+
+    // --- NULL-SAFE Gamification Logic ---
+    private void updateGamificationStats(User user, LocalDate today) {
+        // Safely get current values (default to 0 if null)
+        int currentTotal = user.getTotalEntries() != null ? user.getTotalEntries() : 0;
+        int currentStreak = user.getCurrentStreak() != null ? user.getCurrentStreak() : 0;
+        int longestStreak = user.getLongestStreak() != null ? user.getLongestStreak() : 0;
+
+        user.setTotalEntries(currentTotal + 1);
+
+        List<Entry> allEntries = entryRepository.findByUserIdOrderByDateDesc(user.getId());
+        LocalDate yesterday = today.minusDays(1);
+        boolean loggedYesterday = allEntries.stream()
+                .anyMatch(e -> e.getDate().equals(yesterday));
+
+        // If they logged yesterday, OR this is their very first entry
+        if (loggedYesterday || currentTotal == 0) {
+            user.setCurrentStreak(currentStreak + 1);
+        } else {
+            user.setCurrentStreak(1); // Reset streak to 1 (since they logged today)
+        }
+
+        // Update longest streak if current is higher
+        if (user.getCurrentStreak() > longestStreak) {
+            user.setLongestStreak(user.getCurrentStreak());
+        }
+
+        userRepository.save(user);
     }
 
     @Override
@@ -76,12 +109,45 @@ public class EntryServiceImpl implements EntryService {
         }
         
         int stress = latestEntry.get(0).getStress();
-        if (stress <= 3) {
-            return "You're doing great! Your stress is low. Keep up the positive momentum and enjoy your day. 🌟";
-        } else if (stress <= 6) {
-            return "You're managing well. Remember to take short study breaks, stay hydrated, and stretch! ";
-        } else {
-            return "High stress detected. Try the 4-7-8 breathing technique: Inhale for 4s, Hold for 7s, Exhale for 8s. You've got this! 🧘";
+        if (stress <= 3) return "You're doing great! Your stress is low. Keep up the positive momentum! 🌟";
+        else if (stress <= 6) return "You're managing well. Remember to take short study breaks and stay hydrated! ";
+        else return "High stress detected. Try the 4-7-8 breathing technique: Inhale 4s, Hold 7s, Exhale 8s. 🧘";
+    }
+
+    // --- NULL-SAFE Badge Generation Logic ---
+    @Override
+    public List<Map<String, String>> getUserBadges(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        List<Map<String, String>> badges = new ArrayList<>();
+
+        // Safely get values (default to 0 if null)
+        int total = user.getTotalEntries() != null ? user.getTotalEntries() : 0;
+        int longest = user.getLongestStreak() != null ? user.getLongestStreak() : 0;
+
+        if (total >= 1) {
+            badges.add(createBadge("First Step", "Logged your first entry", "🌱"));
         }
+        if (total >= 10) {
+            badges.add(createBadge("Journaler", "Logged 10 entries", "📝"));
+        }
+        if (longest >= 7) {
+            badges.add(createBadge("Week Warrior", "Maintained a 7-day streak", "⚔️"));
+        }
+        if (longest >= 30) {
+            badges.add(createBadge("Month Master", "Maintained a 30-day streak", "👑"));
+        }
+        if (total >= 50) {
+            badges.add(createBadge("Mindfulness Master", "Logged 50 entries", "🧘"));
+        }
+
+        return badges;
+    }
+
+    private Map<String, String> createBadge(String name, String desc, String icon) {
+        Map<String, String> badge = new HashMap<>();
+        badge.put("name", name);
+        badge.put("desc", desc);
+        badge.put("icon", icon);
+        return badge;
     }
 }

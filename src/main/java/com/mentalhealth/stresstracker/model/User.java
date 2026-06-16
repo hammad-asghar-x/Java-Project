@@ -35,12 +35,22 @@ public class User implements UserDetails {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    // --- NEW: Gamification Fields ---
+    @Column(name = "current_streak")
+    private Integer currentStreak = 0;
+
+    @Column(name = "longest_streak")
+    private Integer longestStreak = 0;
+
+    @Column(name = "total_entries")
+    private Integer totalEntries = 0;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
-    // --- Standard Getters and Setters (Replaces Lombok) ---
+    // --- Standard Getters and Setters ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
@@ -61,6 +71,16 @@ public class User implements UserDetails {
     public void setStudentId(String studentId) { this.studentId = studentId; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    // --- NEW Getters and Setters ---
+    public Integer getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(Integer currentStreak) { this.currentStreak = currentStreak; }
+    
+    public Integer getLongestStreak() { return longestStreak; }
+    public void setLongestStreak(Integer longestStreak) { this.longestStreak = longestStreak; }
+    
+    public Integer getTotalEntries() { return totalEntries; }
+    public void setTotalEntries(Integer totalEntries) { this.totalEntries = totalEntries; }
 
     // --- Spring Security Implementation ---
     @Override
